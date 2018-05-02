@@ -55,7 +55,7 @@ def get_data():
         return data
 
 def batch_predict(data,index):
-    one_hot_feature=['age','carrier','consumptionAbility','education','gender','house','os','ct','marriageStatus','productType']
+    one_hot_feature=['age','carrier','consumptionAbility','education','gender','house','os','marriageStatus','productType']
     total = ['age','carrier','consumptionAbility','education','gender','house','os','ct','marriageStatus','productType','LBS','advertiserId','campaignId', 'creativeId','adCategoryId', 'productId']
     vector_feature=['appIdAction','appIdInstall','interest1','interest2','interest3','interest4','interest5','kw1','kw2','kw3','topic1','topic2','topic3']
     for feature in total:
@@ -124,10 +124,14 @@ def LGB_predict(train_x,train_y,test_x,res,index):
 data=get_data()
 train_old=data[data['label']!=-1]
 test_old=data[data['label']==-1]
-MeanEncoder_features = data[['LBS','advertiserId','campaignId', 'creativeId','adCategoryId', 'productId']]
+MeanEncoder_features = ['LBS','advertiserId','campaignId', 'creativeId','adCategoryId', 'productId','ct']
 MeanEncoder = MeanEncoder.MeanEncoder(MeanEncoder_features, n_splits=5, target_type='classification', prior_weight_func=None)
-train = MeanEncoder.transform(train_old)
-test = MeanEncoder.transform(test_old)
+train = MeanEncoder.fit_transform(train_old,train_old['label'])
+test = MeanEncoder.fit_transform(test_old,test_old['label'])
+
+train = train.drop(['LBS','advertiserId','campaignId', 'creativeId','adCategoryId', 'productId','ct','LBS_pred_0','advertiserId_pred_0','campaignId_pred_0', 'creativeId_pred_0','adCategoryId_pred_0', 'productId_pred_0','ct_pred_0'],axis=1)
+test = test.drop(['LBS','advertiserId','campaignId', 'creativeId','adCategoryId', 'productId','ct','LBS_pred_0','advertiserId_pred_0','campaignId_pred_0', 'creativeId_pred_0','adCategoryId_pred_0', 'productId_pred_0','ct_pred_0'],axis=1)
+
 
 
 del data
